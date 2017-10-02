@@ -47,6 +47,7 @@ class System:
         self._attrib = attrib
         self._callable_ = None
         self._entities = []
+        self._locked = False
     
     @property
     def callable(self):
@@ -61,6 +62,10 @@ class System:
     def attrib(self):
         return self._attrib
     
+    @property
+    def entities(self):
+        return self._entities
+    
     def _add_entity(self, entity):
         self._entities.append(entity)
     
@@ -69,8 +74,12 @@ class System:
         self._entities.pop(index)
     
     def __call__(self, *args, **kwargs):
-        return self._callable_(*args, **kwargs)
-
+        if self._locked: return
+        self._locked = True
+        for entity in self._entities:
+            self._callable_(self, entity, *args, **kwargs)
+        self._locked = False
+        
 def system(attributes):
     def _build_system(callable_):
         new_system = System(attributes)
