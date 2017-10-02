@@ -6,18 +6,18 @@ class TestSystem(unittest.TestCase):
     def test1_system_creation(self):
         @toyblock3.system(("a", "b", 7))
         def get_true(system, entity, test):
-            print(system, entity)
+            print(system, entity, test)
             test.assertTrue(True)
-            
-        self.assertTrue(get_true(self))
+        print(get_true)
+        get_true(self)
         self.assertTrue(get_true.attrib == ("a", "b", 7))
 
 class TestEntity(unittest.TestCase):
     
     def setUp(self):
         @toyblock3.system(("a", "b"))
-        def a_system(system, entity):
-            print(system, entity)
+        def a_system(system, entity, n):
+            print(system, entity, n)
             
         self.a_system = a_system
     
@@ -37,3 +37,5 @@ class TestEntity(unittest.TestCase):
         self.assertTrue(a is b)
         self.assertTrue(self.a_system in A._systems)
         self.assertTrue(c_system._entities not in A._systems)
+        self.a_system(7)
+        c_system()
