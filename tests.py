@@ -17,6 +17,9 @@ class TestEntity(unittest.TestCase):
         attributes = ("a",)
         
         A = toyblock3.factory(attributes, None, 100)
-        self.assertTrue(len(A.entities) == 100)
-        self.assertTrue(isinstance(A.entities[0], A))
-        print(A)
+        self.assertTrue(len(A._entities) == 100)
+        self.assertTrue(isinstance(A._entities[0], A))
+        a = A.get()
+        a.free()
+        b = A.get()
+        self.assertTrue(a is b)

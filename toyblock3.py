@@ -1,8 +1,25 @@
 def factory(attributes, systems, n):
     class Entity:
-        pass
-    entities = [Entity() for i in range(n)]
-    Entity.entities = entities
+        
+        @classmethod
+        def get(Entity):
+            entity = None
+            if Entity._entities:
+                entity = Entity._entities.pop()
+                Entity._used.append(entity)
+            return entity
+        
+        @classmethod
+        def _free(Entity, entity):
+            index = Entity._used.index(entity)
+            Entity._used.pop(index)
+            Entity._entities.append(entity)
+        
+        def free(self):
+            self.__class__._free(self)
+        
+    Entity._entities = [Entity() for i in range(n)]
+    Entity._used = []
     return Entity
 
 class System:
