@@ -15,17 +15,34 @@ def factory(attributes, systems, n):
             Entity._used.pop(index)
             Entity._entities.append(entity)
         
+        @property
+        def attrib(self):
+            self.__class__._attrib
+        
         def free(self):
             self.__class__._free(self)
-        
-    Entity._entities = [Entity() for i in range(n)]
+    
+    entities = [Entity() for i in range(n)]
+    
+    Entity._attrib = attributes #  Replace later by __slots__
+    Entity._entities = entities
     Entity._used = []
+    
+    for system in systems:
+        insert = False
+        for attr in attributes:
+            insert = insert or attr in system.attrib
+            if not insert: continue
+            for entity in entities:
+                system._add_entity(entity)
+    
     return Entity
 
 class System:
     def __init__(self, attrib):
         self._attrib = attrib
         self._callable_ = None
+        self._entities = []
     
     @property
     def callable(self):
@@ -39,6 +56,9 @@ class System:
     @property
     def attrib(self):
         return self._attrib
+    
+    def _add_entity(self, entity):
+        self._entities.append(entity)
     
     def __call__(self, *args, **kwargs):
         return self._callable_(*args, **kwargs)
