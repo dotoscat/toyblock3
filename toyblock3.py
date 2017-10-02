@@ -7,6 +7,8 @@ def factory(attributes, systems, n):
             if Entity._entities:
                 entity = Entity._entities.pop()
                 Entity._used.append(entity)
+                for system in Entity._systems:
+                    system._add_entity(entity)
             return entity
         
         @classmethod
@@ -14,6 +16,8 @@ def factory(attributes, systems, n):
             index = Entity._used.index(entity)
             Entity._used.pop(index)
             Entity._entities.append(entity)
+            for system in Entity._systems:
+                system._remove_entity(entity)
         
         @property
         def attrib(self):
