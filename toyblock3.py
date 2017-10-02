@@ -33,8 +33,7 @@ def factory(attributes, systems, n):
         for attr in attributes:
             insert = insert or attr in system.attrib
             if not insert: continue
-            for entity in entities:
-                system._add_entity(entity)
+            # Insert system on Entity
     
     return Entity
 
@@ -59,6 +58,10 @@ class System:
     
     def _add_entity(self, entity):
         self._entities.append(entity)
+    
+    def _remove_entity(self.entity):
+        index = self._entities.index(entity)
+        self._entities.pop(index)
     
     def __call__(self, *args, **kwargs):
         return self._callable_(*args, **kwargs)
