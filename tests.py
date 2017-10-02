@@ -5,10 +5,11 @@ class TestSystem(unittest.TestCase):
         
     def test1_system_creation(self):
         @toyblock3.system(("a", "b", 7))
-        def get_true(value):
-            return value
+        def get_true(system, entity, test):
+            print(system, entity)
+            test.assertTrue(True)
             
-        self.assertTrue(get_true(True))
+        self.assertTrue(get_true(self))
         self.assertTrue(get_true.attrib == ("a", "b", 7))
 
 class TestEntity(unittest.TestCase):

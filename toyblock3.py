@@ -48,6 +48,8 @@ class System:
         self._callable_ = None
         self._entities = []
         self._locked = False
+        self._add_entity_list = []
+        self._remove_entity_list = []
     
     @property
     def callable(self):
@@ -67,11 +69,17 @@ class System:
         return self._entities
     
     def _add_entity(self, entity):
-        self._entities.append(entity)
+        if self._locked:
+            self._add_entity_list.append(entity)
+        else:
+            self._entities.append(entity)
     
     def _remove_entity(self, entity):
-        index = self._entities.index(entity)
-        self._entities.pop(index)
+        if self._locked:
+            self._remove_entity_list.append(entity)
+        else:
+            index = self._entities.index(entity)
+            self._entities.pop(index)
     
     def __call__(self, *args, **kwargs):
         if self._locked: return
@@ -79,6 +87,10 @@ class System:
         for entity in self._entities:
             self._callable_(self, entity, *args, **kwargs)
         self._locked = False
+        while self._remove_entity_list:
+            self._remove_entity(self._remove_entity_list.pop())
+        while self._add_entity_list:
+            self._add_entity(self._add_entity_list.pop())
         
 def system(attributes):
     def _build_system(callable_):
