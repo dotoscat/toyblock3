@@ -34,5 +34,5 @@ class TestEntity(unittest.TestCase):
         a.free()
         b = A.get()
         self.assertTrue(a is b)
-        self.assertTrue(len(self.a_system._entities) == 10)
-        self.assertTrue(len(c_system._entities) == 0)
+        self.assertTrue(self.a_system in A._systems)
+        self.assertTrue(c_system._entities not in A._systems)

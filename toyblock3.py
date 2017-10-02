@@ -27,13 +27,14 @@ def factory(attributes, systems, n):
     Entity._attrib = attributes #  Replace later by __slots__
     Entity._entities = entities
     Entity._used = []
+    Entity._systems = []
     
     for system in systems:
         insert = False
         for attr in attributes:
             insert = insert or attr in system.attrib
             if not insert: continue
-            # Insert system on Entity
+            Entity._systems.append(system)
     
     return Entity
 
@@ -59,7 +60,7 @@ class System:
     def _add_entity(self, entity):
         self._entities.append(entity)
     
-    def _remove_entity(self.entity):
+    def _remove_entity(self, entity):
         index = self._entities.index(entity)
         self._entities.pop(index)
     
