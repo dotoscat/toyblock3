@@ -1,5 +1,9 @@
-class Entity:
-    pass
+def factory(attributes, systems, n):
+    class Entity:
+        pass
+    entities = [Entity() for i in range(n)]
+    Entity.entities = entities
+    return Entity
 
 class System:
     def __init__(self, attrib):
