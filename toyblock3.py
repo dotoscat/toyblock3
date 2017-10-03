@@ -31,7 +31,7 @@ def factory(attributes, systems, n):
     
     entities = [Entity() for i in range(n)]
     
-    Entity._attrib = attributes #  Replace later by __slots__
+    Entity._attrib = attributes
     Entity._entities = deque(entities)
     Entity._used = deque()
     Entity._systems = []
