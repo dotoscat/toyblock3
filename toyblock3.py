@@ -1,3 +1,5 @@
+from collections import deque
+
 def factory(attributes, systems, n):
     class Entity:
         
@@ -48,10 +50,10 @@ class System:
             raise ValueError("Pass a list or tuple with attribute names.")
         self._attrib = attrib
         self._callable_ = None
-        self._entities = []
+        self._entities = deque()
         self._locked = False
-        self._add_entity_list = []
-        self._remove_entity_list = []
+        self._add_entity_list = deque()
+        self._remove_entity_list = deque()
     
     @property
     def callable(self):
@@ -82,8 +84,7 @@ class System:
         if self._locked:
             self._remove_entity_list.append(entity)
         else:
-            index = self._entities.index(entity)
-            self._entities.pop(index)
+            self._entities.remove(entity)
     
     def __call__(self, *args, **kwargs):
         if self._locked: return
@@ -92,9 +93,9 @@ class System:
             self._callable_(self, entity, *args, **kwargs)
         self._locked = False
         while self._remove_entity_list:
-            self._remove_entity(self._remove_entity_list.pop())
+            self._entities.remove(self._remove_entity_list.pop())
         while self._add_entity_list:
-            self._add_entity(self._add_entity_list.pop())
+            self._entities.append(self._add_entity_list.pop())
         
 def system(attributes):
     def _build_system(callable_):
