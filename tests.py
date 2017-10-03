@@ -11,6 +11,18 @@ class TestSystem(unittest.TestCase):
         print(get_true)
         get_true(self)
         self.assertTrue(get_true.attrib == ("a", "b", 7))
+        
+    def test2_wrong_attributes_list(self):
+        with self.assertRaises(ValueError):
+            @toyblock3.system({})
+            def one(): pass
+            @toyblock3.system(7)
+            def two(): pass
+            
+    def test_wrong_callable(self):
+        with self.assertRaises(ValueError):
+            build_system = toyblock3.system(('a',))
+            build_system(1)
 
 class TestEntity(unittest.TestCase):
     

@@ -44,6 +44,8 @@ def factory(attributes, systems, n):
 
 class System:
     def __init__(self, attrib):
+        if not (isinstance(attrib, tuple) or isinstance(attrib, list)):
+            raise ValueError("Pass a list or tuple with attribute names.")
         self._attrib = attrib
         self._callable_ = None
         self._entities = []
@@ -58,6 +60,8 @@ class System:
     @callable.setter
     def callable(self, callable_):
         if self._callable_ is None:
+            if not callable(callable_):
+                raise ValueError("Use a callable object.")
             self._callable_ = callable_
     
     @property
