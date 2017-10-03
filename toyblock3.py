@@ -15,8 +15,7 @@ def factory(attributes, systems, n):
         
         @classmethod
         def _free(Entity, entity):
-            index = Entity._used.index(entity)
-            Entity._used.pop(index)
+            Entity._used.remove(entity)
             Entity._entities.append(entity)
             for system in Entity._systems:
                 system._remove_entity(entity)
@@ -31,8 +30,8 @@ def factory(attributes, systems, n):
     entities = [Entity() for i in range(n)]
     
     Entity._attrib = attributes #  Replace later by __slots__
-    Entity._entities = entities
-    Entity._used = []
+    Entity._entities = deque(entities)
+    Entity._used = deque()
     Entity._systems = []
     
     for system in systems:
