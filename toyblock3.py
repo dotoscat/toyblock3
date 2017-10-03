@@ -87,9 +87,11 @@ class System:
     
     def __call__(self, *args, **kwargs):
         if self._locked: return
+        entities = self._entities
+        callable_ = self._callable_
         self._locked = True
-        for entity in self._entities:
-            self._callable_(self, entity, *args, **kwargs)
+        for entity in entities:
+            callable_(self, entity, *args, **kwargs)
         self._locked = False
         while self._remove_entity_list:
             self._entities.remove(self._remove_entity_list.pop())
