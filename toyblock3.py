@@ -1,7 +1,9 @@
 from collections import deque
 
 def factory(attributes, systems, n):
+
     class Entity:
+        __slots__ = attributes
         
         @classmethod
         def get(Entity):
@@ -19,10 +21,10 @@ def factory(attributes, systems, n):
             Entity._entities.append(entity)
             for system in Entity._systems:
                 system._remove_entity(entity)
-        
-        @property
-        def attrib(self):
-            self.__class__._attrib
+                
+        @classmethod
+        def attrib(Entity):
+            return Entity._attrib
         
         def free(self):
             self.__class__._free(self)
