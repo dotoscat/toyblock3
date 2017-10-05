@@ -61,6 +61,10 @@ class TestEntityBuilder(unittest.TestCase):
         
         for entry in builder:
             print(entry)
-            
+        
+        print(builder.components)
+        
+        self.assertEqual(builder.components, ("id", "id2"))
+        
     def test2_full_example(self):
         pass

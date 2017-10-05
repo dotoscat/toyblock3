@@ -17,6 +17,10 @@ class EntityBuilder:
         self._component[component] = {"type": type_, "args": args, "kwargs": kwargs}
         return self
 
+    @property
+    def components(self):
+        return tuple(self._component.keys())
+
     def __iter__(self):
         self._iterator = iter(self._component)
         return self
