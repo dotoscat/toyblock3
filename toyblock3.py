@@ -7,6 +7,27 @@ def _check_components_are(components, type_):
         if not isinstance(component, type_):
             raise ValueError("Pass {} as parameters. Found a {}".format(type_, type(component)))
 
+class EntityBuilder:
+    def __init__(self):
+        self._component = {}
+        self._iterator = None
+        
+    def add(self, component, type_, *args, **kwargs):
+        # Check types or arguments
+        self._component[component] = {"type": type_, "args": args, "kwargs": kwargs}
+        return self
+
+    def __iter__(self):
+        self._iterator = iter(self._component)
+        return self
+        
+    def __next__(self):
+        key = next(self._iterator)
+        type_ = self._component[key]["type"]
+        args = self._component[key]["args"]
+        kwargs = self._component[key]["kwargs"]
+        return key, type_(*args, **kwargs)
+    
 def factory(components, systems, n):
 
     _check_components_are(components, str)

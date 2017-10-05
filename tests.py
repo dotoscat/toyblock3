@@ -50,3 +50,17 @@ class TestEntity(unittest.TestCase):
         self.assertTrue(c_system._entities not in A._systems)
         self.a_system(7)
         c_system()
+
+class TestEntityBuilder(unittest.TestCase):
+    
+    def test1_works_well(self):
+        
+        builder = toyblock3.EntityBuilder()
+        builder.add("id", int)
+        builder.add("id2", int, 7)
+        
+        for entry in builder:
+            print(entry)
+            
+    def test2_full_example(self):
+        pass
