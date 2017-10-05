@@ -39,17 +39,20 @@ def factory(attributes, systems, n):
     for system in systems:
         insert = False
         for attr in attributes:
-            insert = insert or attr in system.attrib
+            insert = insert or attr in system.components
             if not insert: continue
             Entity._systems.append(system)
     
     return Entity
 
 class System:
-    def __init__(self, attrib):
-        if not (isinstance(attrib, tuple) or isinstance(attrib, list)):
-            raise ValueError("Pass a list or tuple with attribute names.")
-        self._attrib = attrib
+    def __init__(self, *components):
+        if not (isinstance(components, tuple) or isinstance(components, list)):
+            raise ValueError("Pass a tuple or list with component names.")
+        for component in components:
+            if not isinstance(component, str):
+                raise ValueError("Pass strings as parameters. Found a {}".format(type(component)))
+        self._components = components
         self._callable_ = None
         self._entities = deque()
         self._locked = False
@@ -68,8 +71,8 @@ class System:
             self._callable_ = callable_
     
     @property
-    def attrib(self):
-        return self._attrib
+    def components(self):
+        return self._components
     
     @property
     def entities(self):
@@ -100,9 +103,9 @@ class System:
         while self._add_entity_list:
             self._entities.append(self._add_entity_list.pop())
         
-def system(attributes):
+def system(*components):
     def _build_system(callable_):
-        new_system = System(attributes)
+        new_system = System(*components)
         new_system.callable = callable_
         return new_system
     return _build_system

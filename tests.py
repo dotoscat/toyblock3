@@ -4,13 +4,12 @@ import toyblock3
 class TestSystem(unittest.TestCase):
         
     def test1_system_creation(self):
-        @toyblock3.system(("a", "b", 7))
+        @toyblock3.system("a", "b", "c")
         def get_true(system, entity, test):
             print(system, entity, test)
             test.assertTrue(True)
-        print(get_true)
         get_true(self)
-        self.assertTrue(get_true.attrib == ("a", "b", 7))
+        self.assertTrue(get_true.components == ("a", "b", "c"))
         
     def test2_wrong_attributes_list(self):
         with self.assertRaises(ValueError):
@@ -27,7 +26,7 @@ class TestSystem(unittest.TestCase):
 class TestEntity(unittest.TestCase):
     
     def setUp(self):
-        @toyblock3.system(("a", "b"))
+        @toyblock3.system("a", "b")
         def a_system(system, entity, n):
             print(system, entity, n)
             
@@ -36,7 +35,7 @@ class TestEntity(unittest.TestCase):
     def test1_entity_creation(self):
         attributes = ("a",)
         
-        @toyblock3.system(("c",))
+        @toyblock3.system("c")
         def c_system(system, entity):
             print(system, entity)
         
