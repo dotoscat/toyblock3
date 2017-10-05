@@ -7,80 +7,73 @@ def _check_components_are(components, type_):
         if not isinstance(component, type_):
             raise ValueError("Pass {} as parameters. Found a {}".format(type_, type(component)))
 
-class EntityBuilder:
+class EntityFactory:
     def __init__(self):
-        self._component = {}
-        self._iterator = None
+        self._components = {}
         
     def add(self, component, type_, *args, **kwargs):
-        # Check types or arguments
-        self._component[component] = {"type": type_, "args": args, "kwargs": kwargs}
+        if not isinstance(component, str):
+            raise ValueError("component must be a String type. {} given.".format(type(component)))
+        self._components[component] = {"type": type_, "args": args, "kwargs": kwargs}
         return self
 
     @property
     def components(self):
-        return tuple(self._component.keys())
-
-    def __iter__(self):
-        self._iterator = iter(self._component)
-        return self
+        return tuple(self._components.keys())
         
-    def __next__(self):
-        key = next(self._iterator)
-        type_ = self._component[key]["type"]
-        args = self._component[key]["args"]
-        kwargs = self._component[key]["kwargs"]
-        return key, type_(*args, **kwargs)
-    
-def factory(components, systems, n):
+    def build(self, n, *systems):
+        _check_components_are(systems, System)
+        if not isinstance(n, int):
+            raise ValueError("Pass an intenger. Found {}".format(type(n)))
 
-    _check_components_are(components, str)
-    _check_components_are(systems, System)
-    if not isinstance(n, int):
-        raise ValueError("Pass an intenger. Found {}".format(type(n)))
-
-    class Entity:
-        __slots__ = components
-        
-        @classmethod
-        def get(Entity):
-            entity = None
-            if Entity._entities:
-                entity = Entity._entities.pop()
-                Entity._used.append(entity)
+        class Entity:
+            __slots__ = self.components
+            
+            @classmethod
+            def get(Entity):
+                entity = None
+                if Entity._entities:
+                    entity = Entity._entities.pop()
+                    Entity._used.append(entity)
+                    for system in Entity._systems:
+                        system._add_entity(entity)
+                return entity
+            
+            @classmethod
+            def _free(Entity, entity):
+                Entity._used.remove(entity)
+                Entity._entities.append(entity)
                 for system in Entity._systems:
-                    system._add_entity(entity)
-            return entity
+                    system._remove_entity(entity)
+                    
+            @classmethod
+            def attrib(Entity):
+                return Entity._attrib
+            
+            def free(self):
+                self.__class__._free(self)
         
-        @classmethod
-        def _free(Entity, entity):
-            Entity._used.remove(entity)
-            Entity._entities.append(entity)
-            for system in Entity._systems:
-                system._remove_entity(entity)
-                
-        @classmethod
-        def attrib(Entity):
-            return Entity._attrib
+        entities = deque((Entity() for i in range(n)))
+        for entity in entities:
+            for component in self._components:
+                type_ = self._component[component]["type"]
+                args = self._component[component]["args"]
+                kwargs = self._component[component]["kwargs"]
+                setattr(entity, component, type_(*args, **kwargs))
         
-        def free(self):
-            self.__class__._free(self)
-    
-    entities = [Entity() for i in range(n)]
-    
-    Entity._components = components
-    Entity._entities = deque(entities)
-    Entity._used = deque()
-    Entity._systems = []
-    
-    for system in systems:
-        insert = False
-        for component in components:
-            insert = insert or component in system.components
-            if not insert: continue
-            Entity._systems.append(system)
-    
-    return Entity
+        Entity._components = self.components
+        Entity._entities = entities
+        Entity._used = deque()
+        Entity._systems = []
+        
+        for system in systems:
+            insert = False
+            for component in self.components:
+                insert = insert or component in system.components
+                if not insert: continue
+                Entity._systems.append(system)
+        
+        return Entity
 
 class System:
     def __init__(self, *components):

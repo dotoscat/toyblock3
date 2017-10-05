@@ -55,7 +55,7 @@ class TestEntityBuilder(unittest.TestCase):
     
     def test1_works_well(self):
         
-        builder = toyblock3.EntityBuilder()
+        builder = toyblock3.EntityFactory()
         builder.add("id", int)
         builder.add("id2", int, 7)
         
@@ -67,4 +67,10 @@ class TestEntityBuilder(unittest.TestCase):
         self.assertEqual(builder.components, ("id", "id2"))
         
     def test2_full_example(self):
-        pass
+        
+        @toyblock3.System("op1, op2")
+        def suma(system, entity):
+            my_sum = entity.op1 + entity.op2
+            self.assertEqual(my_sum, 7)
+
+        #table = toyblock3.factory(("op1", "op2", ))
