@@ -1,9 +1,21 @@
 from collections import deque
 
-def factory(attributes, systems, n):
+def _check_components_are(components, type_):
+    if not (isinstance(components, tuple) or isinstance(components, list)):
+        raise ValueError("Pass a tuple or list with {}.").format(type_)
+    for component in components:
+        if not isinstance(component, type_):
+            raise ValueError("Pass {} as parameters. Found a {}".format(type_, type(component)))
+
+def factory(components, systems, n):
+
+    _check_components_are(components, str)
+    _check_components_are(systems, System)
+    if not isinstance(n, int):
+        raise ValueError("Pass an intenger. Found {}".format(type(n)))
 
     class Entity:
-        __slots__ = attributes
+        __slots__ = components
         
         @classmethod
         def get(Entity):
@@ -31,15 +43,15 @@ def factory(attributes, systems, n):
     
     entities = [Entity() for i in range(n)]
     
-    Entity._attrib = attributes
+    Entity._components = components
     Entity._entities = deque(entities)
     Entity._used = deque()
     Entity._systems = []
     
     for system in systems:
         insert = False
-        for attr in attributes:
-            insert = insert or attr in system.components
+        for component in components:
+            insert = insert or component in system.components
             if not insert: continue
             Entity._systems.append(system)
     
@@ -47,11 +59,7 @@ def factory(attributes, systems, n):
 
 class System:
     def __init__(self, *components):
-        if not (isinstance(components, tuple) or isinstance(components, list)):
-            raise ValueError("Pass a tuple or list with component names.")
-        for component in components:
-            if not isinstance(component, str):
-                raise ValueError("Pass strings as parameters. Found a {}".format(type(component)))
+        _check_components_are(components, str)
         self._components = components
         self._callable_ = None
         self._entities = deque()
