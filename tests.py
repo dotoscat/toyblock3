@@ -41,7 +41,7 @@ class TestEntity(unittest.TestCase):
         builder = toyblock3.InstanceBuilder()
         builder.add('a', int)
         
-        A = toyblock3.build(10, builder, self.a_system, c_system)
+        A = toyblock3.build_Entity(10, builder, self.a_system, c_system)
         self.assertTrue(len(A._entities) == 10)
         self.assertTrue(isinstance(A._entities[0], A))
         a = A.get()

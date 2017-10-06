@@ -33,7 +33,7 @@ class InstanceBuilder:
         kwargs = self._components[component]["kwargs"]
         return component, type_(*args, **kwargs)
 
-def build(n, instance_builder, *systems):
+def build_Entity(n, instance_builder, *systems):
     _check_components_are(systems, System)
     if not isinstance(n, int):
         raise ValueError("Pass an intenger. Found {}".format(type(n)))
@@ -61,8 +61,8 @@ def build(n, instance_builder, *systems):
                 system._remove_entity(entity)
                 
         @classmethod
-        def attrib(Entity):
-            return Entity._attrib
+        def components(Entity):
+            return Entity._components
         
         def free(self):
             self.__class__._free(self)
