@@ -22,23 +22,23 @@ class InstanceBuilder:
     def components(self):
         return tuple(self._components.keys())
         
-    def __iterator__(self):
+    def __iter__(self):
         self._iterator = iter(self._components)
         return self
         
     def __next__(self):
-        component = next(self._components)
-        type_ = self._component[component]["type"]
-        args = self._component[component]["args"]
-        kwargs = self._component[component]["kwargs"]
+        component = next(self._iterator)
+        type_ = self._components[component]["type"]
+        args = self._components[component]["args"]
+        kwargs = self._components[component]["kwargs"]
         return component, type_(*args, **kwargs)
 
-def build(self, n, instance_builder, *systems):
+def build(n, instance_builder, *systems):
     _check_components_are(systems, System)
     if not isinstance(n, int):
         raise ValueError("Pass an intenger. Found {}".format(type(n)))
-    if not isinstance(builder, InstanceBuilder):
-        raise ValueError("Pass an intenger. Found {}".format(type(n)))
+    if not isinstance(instance_builder, InstanceBuilder):
+        raise ValueError("Pass an InstanceBuilder. Found {}".format(type(n)))
 
     class Entity:
         __slots__ = instance_builder.components
@@ -79,7 +79,7 @@ def build(self, n, instance_builder, *systems):
     
     for system in systems:
         insert = False
-        for component in self.components:
+        for component in instance_builder.components:
             insert = insert or component in system.components
             if not insert: continue
             Entity._systems.append(system)
