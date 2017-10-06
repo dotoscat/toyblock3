@@ -33,13 +33,15 @@ class TestEntity(unittest.TestCase):
         self.a_system = a_system
     
     def test1_entity_creation(self):
-        attributes = ("a",)
         
         @toyblock3.system("c")
         def c_system(system, entity):
             print(system, entity)
         
-        A = toyblock3.factory(attributes, (self.a_system, c_system), 10)
+        builder = toyblock3.InstanceBuilder()
+        builder.add('a', int)
+        
+        A = toyblock3.build(10, builder, self.a_system, c_system)
         self.assertTrue(len(A._entities) == 10)
         self.assertTrue(isinstance(A._entities[0], A))
         a = A.get()
@@ -55,7 +57,7 @@ class TestEntityBuilder(unittest.TestCase):
     
     def test1_works_well(self):
         
-        builder = toyblock3.EntityFactory()
+        builder = toyblock3.InstanceBuilder()
         builder.add("id", int)
         builder.add("id2", int, 7)
         
