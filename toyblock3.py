@@ -109,10 +109,12 @@ class System:
     
     @property
     def components(self):
+        """Components defined for this System."""
         return self._components
     
     @property
     def entities(self):
+        """Return the current entities that are in."""
         return self._entities
     
     def _add_entity(self, entity):
@@ -128,6 +130,22 @@ class System:
             self._entities.remove(entity)
     
     def __call__(self, *args, **kwargs):
+        """Call this system to compute them.
+        
+        Example:
+        
+            .. code-block: python
+            
+                @toyblock3.system('body')
+                def physics(system, entity, dt):
+                    entity.body.update(dt)
+                    
+                #  Add some entities to this system.
+                
+                while not game_over:
+                    physics(get_dt_time())
+        
+        """
         if self._locked: return
         entities = self._entities
         callable_ = self._callable_
@@ -141,6 +159,26 @@ class System:
             self._entities.append(self._add_entity_list.pop())
         
 def system(*components):
+    """Convenient decorator with arguments to build a System instance.
+    
+    Arguments:
+        *components (:class:str): Member names of an Entity
+    
+    Raises:
+        ValueError if any component is not a :class:str
+    
+    Returns:
+        An instance of :class:Entity
+    
+    Example:
+    
+        .. code-block:: python
+        
+            @toyblock3.system('body', 'sprite')
+            def update_sprite(system, entity):
+                entity.sprite.set(body.position)
+    
+    """
     def _build_system(callable_):
         new_system = System(*components)
         new_system.callable = callable_
