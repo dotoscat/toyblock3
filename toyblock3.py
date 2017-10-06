@@ -7,9 +7,10 @@ def _check_components_are(components, type_):
         if not isinstance(component, type_):
             raise ValueError("Pass {} as parameters. Found a {}".format(type_, type(component)))
 
-class EntityFactory:
+class InstanceBuilder:
     def __init__(self):
         self._components = {}
+        self._iterator = None
         
     def add(self, component, type_, *args, **kwargs):
         if not isinstance(component, str):
@@ -21,59 +22,69 @@ class EntityFactory:
     def components(self):
         return tuple(self._components.keys())
         
-    def build(self, n, *systems):
-        _check_components_are(systems, System)
-        if not isinstance(n, int):
-            raise ValueError("Pass an intenger. Found {}".format(type(n)))
+    def __iterator__(self):
+        self._iterator = iter(self._components)
+        return self
+        
+    def __next__(self):
+        component = next(self._components)
+        type_ = self._component[component]["type"]
+        args = self._component[component]["args"]
+        kwargs = self._component[component]["kwargs"]
+        return component, type_(*args, **kwargs)
 
-        class Entity:
-            __slots__ = self.components
-            
-            @classmethod
-            def get(Entity):
-                entity = None
-                if Entity._entities:
-                    entity = Entity._entities.pop()
-                    Entity._used.append(entity)
-                    for system in Entity._systems:
-                        system._add_entity(entity)
-                return entity
-            
-            @classmethod
-            def _free(Entity, entity):
-                Entity._used.remove(entity)
-                Entity._entities.append(entity)
+def build(self, n, instance_builder, *systems):
+    _check_components_are(systems, System)
+    if not isinstance(n, int):
+        raise ValueError("Pass an intenger. Found {}".format(type(n)))
+    if not isinstance(builder, InstanceBuilder):
+        raise ValueError("Pass an intenger. Found {}".format(type(n)))
+
+    class Entity:
+        __slots__ = instance_builder.components
+        
+        @classmethod
+        def get(Entity):
+            entity = None
+            if Entity._entities:
+                entity = Entity._entities.pop()
+                Entity._used.append(entity)
                 for system in Entity._systems:
-                    system._remove_entity(entity)
-                    
-            @classmethod
-            def attrib(Entity):
-                return Entity._attrib
-            
-            def free(self):
-                self.__class__._free(self)
+                    system._add_entity(entity)
+            return entity
         
-        entities = deque((Entity() for i in range(n)))
-        for entity in entities:
-            for component in self._components:
-                type_ = self._component[component]["type"]
-                args = self._component[component]["args"]
-                kwargs = self._component[component]["kwargs"]
-                setattr(entity, component, type_(*args, **kwargs))
+        @classmethod
+        def _free(Entity, entity):
+            Entity._used.remove(entity)
+            Entity._entities.append(entity)
+            for system in Entity._systems:
+                system._remove_entity(entity)
+                
+        @classmethod
+        def attrib(Entity):
+            return Entity._attrib
         
-        Entity._components = self.components
-        Entity._entities = entities
-        Entity._used = deque()
-        Entity._systems = []
-        
-        for system in systems:
-            insert = False
-            for component in self.components:
-                insert = insert or component in system.components
-                if not insert: continue
-                Entity._systems.append(system)
-        
-        return Entity
+        def free(self):
+            self.__class__._free(self)
+    
+    entities = deque((Entity() for i in range(n)))
+    for entity in entities:
+        for component, instance in instance_builder:
+            setattr(entity, component, instance)
+    
+    Entity._components = instance_builder.components
+    Entity._entities = entities
+    Entity._used = deque()
+    Entity._systems = []
+    
+    for system in systems:
+        insert = False
+        for component in self.components:
+            insert = insert or component in system.components
+            if not insert: continue
+            Entity._systems.append(system)
+    
+    return Entity
 
 class System:
     def __init__(self, *components):
