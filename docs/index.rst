@@ -21,6 +21,9 @@ Welcome to toyblock3's documentation!
 
 .. autofunction:: toyblock3.build_Entity
 
+.. autoclass: Entity
+    :members:
+
 Indices and tables
 ==================
 

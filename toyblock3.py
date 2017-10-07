@@ -103,10 +103,17 @@ def build_Entity(n, instance_builder, *systems):
         raise ValueError("Pass an InstanceBuilder. Found {}".format(type(n)))
 
     class Entity:
+        """Pool of :class:`Entity` instances.
+        
+        You can access to any instance's defined for this Entity.
+        Each Entity are different from each other but they have the same interface.
+        
+        """
         __slots__ = instance_builder.components
         
         @classmethod
         def get(Entity):
+            """Return an unused instance from its pool."""
             entity = None
             if Entity._entities:
                 entity = Entity._entities.pop()
@@ -124,9 +131,11 @@ def build_Entity(n, instance_builder, *systems):
                 
         @classmethod
         def components(Entity):
+            """Get a tuple of the components defined for this :class:`Entity`."""
             return Entity._components
         
         def free(self):
+            """Free this entity. Return this to its Pool"""
             self.__class__._free(self)
     
     entities = deque((Entity() for i in range(n)))

@@ -18,3 +18,4 @@ TODO
 - Implement set to Entity.
 - Add init and clean static class method to Entity.
 - Fix system example (missing entity).
+- Add custom doc for toyblock3 Entity
