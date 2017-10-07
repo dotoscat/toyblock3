@@ -8,11 +8,35 @@ def _check_components_are(components, type_):
             raise ValueError("Pass {} as parameters. Found a {}".format(type_, type(component)))
 
 class InstanceBuilder:
+    """Define what are the components.
+    
+    This is a helper class to :func:`build_Entity` (and for you)
+    
+    Example:
+        
+        .. code-block:: python
+        
+            builder = toyblock3.InstanceBuilder()
+            builder.add("body", Body, x=32, y=32)
+            
+    """
     def __init__(self):
         self._components = {}
         self._iterator = None
         
     def add(self, component, type_, *args, **kwargs):
+        """Defines what a component is.
+        
+        Add a component with its type and arguments.
+        
+        It is possible chain :meth:`InstanceBuilder.add`.
+        
+        Returns:
+            This instance
+        
+        Raises:
+            ValueError if :obj:`component` is not a :class:`str`.
+        """
         if not isinstance(component, str):
             raise ValueError("component must be a String type. {} given.".format(type(component)))
         self._components[component] = {"type": type_, "args": args, "kwargs": kwargs}
@@ -20,6 +44,7 @@ class InstanceBuilder:
 
     @property
     def components(self):
+        """Return a tuple with the components added to this builder until now."""
         return tuple(self._components.keys())
         
     def __iter__(self):
