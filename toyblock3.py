@@ -260,7 +260,7 @@ def system(*components):
         
             @toyblock3.system('body', 'sprite')
             def update_sprite(system, entity):
-                entity.sprite.set(body.position)
+                entity.sprite.set(entity.body.position)
     
     """
     def _build_system(callable_):
