@@ -9,7 +9,13 @@ Welcome to toyblock3's documentation!
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+    
+.. autofunction:: toyblock3.system
 
+.. autoclass:: toyblock3.System
+    :members:
+    :special-members: __call__
+    
 Indices and tables
 ==================
 

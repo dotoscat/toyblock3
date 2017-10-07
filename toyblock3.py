@@ -114,7 +114,7 @@ class System:
     
     @property
     def entities(self):
-        """Return the current entities that are in."""
+        """Return the current entities that are in this System."""
         return self._entities
     
     def _add_entity(self, entity):
@@ -130,15 +130,18 @@ class System:
             self._entities.remove(entity)
     
     def __call__(self, *args, **kwargs):
-        """Call this system to compute them.
+        """Call the system to compute the entities.
         
         Example:
         
-            .. code-block: python
+            .. code-block:: python
             
                 @toyblock3.system('body')
                 def physics(system, entity, dt):
                     entity.body.update(dt)
+                    for other_entity in system.entities:
+                        check_collision_with(entity, other_entity)
+                        #  more stuff
                     
                 #  Add some entities to this system.
                 
@@ -162,13 +165,13 @@ def system(*components):
     """Convenient decorator with arguments to build a System instance.
     
     Arguments:
-        *components (:class:str): Member names of an Entity
+        *components (:class:`str`): Member names of an :class:`Entity`
     
     Raises:
-        ValueError if any component is not a :class:str
+        ValueError if any component is not a :class:`str`
     
     Returns:
-        An instance of :class:Entity
+        An instance of :class:`Entity`
     
     Example:
     
