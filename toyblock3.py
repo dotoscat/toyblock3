@@ -98,6 +98,16 @@ class System:
     
     @property
     def callable(self):
+        """You can only set this property once.
+        
+        This property is visible if you write a class that inherits
+        from :class:`System`.
+        
+        :func:`system` decorator will set the callable for you.
+        
+        Raises:
+            ValueError if the object assigned is not a *callable*.
+        """
         return self._callable_
         
     @callable.setter
@@ -171,7 +181,7 @@ def system(*components):
         ValueError if any component is not a :class:`str`
     
     Returns:
-        An instance of :class:`Entity`
+        An instance of :class:`System`
     
     Example:
     
