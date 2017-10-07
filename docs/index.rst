@@ -21,8 +21,25 @@ Welcome to toyblock3's documentation!
 
 .. autofunction:: toyblock3.build_Entity
 
-.. autoclass: Entity
-    :members:
+.. py:class:: toyblock3.Entity
+    
+    Pool of :class:`Entity` instances.
+        
+    You can access to any instance defined for this Entity.
+    Each Entity are different from each other but they have the same interface.
+
+    .. py:staticmethod:: get
+    
+        Return an unused instance from its pool and add it to the systems.
+
+    .. py:staticmethod:: components
+    
+        You can access to any instance's defined for this Entity.
+        Each Entity are different from each other but they have the same interface.
+        
+    .. py:method:: free
+    
+        Free this entity returning it to its pool and remove it from the systems.
 
 Indices and tables
 ==================

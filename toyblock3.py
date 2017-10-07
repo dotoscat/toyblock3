@@ -105,7 +105,7 @@ def build_Entity(n, instance_builder, *systems):
     class Entity:
         """Pool of :class:`Entity` instances.
         
-        You can access to any instance's defined for this Entity.
+        You can access to any instance defined for this Entity.
         Each Entity are different from each other but they have the same interface.
         
         """
@@ -135,7 +135,7 @@ def build_Entity(n, instance_builder, *systems):
             return Entity._components
         
         def free(self):
-            """Free this entity. Return this to its Pool"""
+            """Free this entity."""
             self.__class__._free(self)
     
     entities = deque((Entity() for i in range(n)))
