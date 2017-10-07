@@ -17,3 +17,4 @@ TODO
 
 - Implement set to Entity.
 - Add init and clean static class method to Entity.
+- Fix system example (missing entity).

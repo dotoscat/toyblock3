@@ -10,7 +10,7 @@ def _check_components_are(components, type_):
 class InstanceBuilder:
     """Define what are the components.
     
-    This is a helper class to :func:`build_Entity` (and for you)
+    This is a helper class for :func:`build_Entity` (and for you).
     
     Example:
         
@@ -18,7 +18,7 @@ class InstanceBuilder:
         
             builder = toyblock3.InstanceBuilder()
             builder.add("body", Body, x=32, y=32)
-            
+            builder.add("sprite", Sprite, hero_image)
     """
     def __init__(self):
         self._components = {}
@@ -32,7 +32,7 @@ class InstanceBuilder:
         It is possible chain :meth:`InstanceBuilder.add`.
         
         Returns:
-            This instance
+            This instance.
         
         Raises:
             ValueError if :obj:`component` is not a :class:`str`.
@@ -59,6 +59,43 @@ class InstanceBuilder:
         return component, type_(*args, **kwargs)
 
 def build_Entity(n, instance_builder, *systems):
+    """Create an custom :class:`Entity`.
+    
+    Create a pool of n instances from a custom :class:`Entity` builded from
+    the instance_builder and the systems added.
+    
+    If there is a component that is not found in a system, that entity will not added to that System.
+    
+    Parameters:
+        n (int): Number of entities created for :class:`Entity`.
+        instance_builder(InstanceBuilder):
+        systems (System):
+    
+    Returns:
+        A custom :class:`Entity`.
+    
+    Raises:
+        ValueError: :obj:`n` is not a :class:`int`
+        ValueError: :obj:`instance_builder` is not a :class:`InstanceBuilder`.
+    
+    Example:
+        
+        .. code-block:: python
+        
+            @toyblock3.system('body')
+            def physics(system, entity, dt):
+                #  add stuff
+    
+            @toyblock3.system('body', 'sprite')
+            def update_sprite(system, entity):
+                #  more stuff
+    
+            builder = toyblock3.InstanceBuilder()
+            builder.add("body", Body, x=x, y=y)
+            builder.add("sprite", Sprite, bullet_image)
+            
+            Bullet = toyblock3.build_Entity(100, builder, physics, update_sprite)
+    """
     _check_components_are(systems, System)
     if not isinstance(n, int):
         raise ValueError("Pass an intenger. Found {}".format(type(n)))

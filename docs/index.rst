@@ -19,6 +19,8 @@ Welcome to toyblock3's documentation!
 .. autoclass:: toyblock3.InstanceBuilder
     :members:
 
+.. autofunction:: toyblock3.build_Entity
+
 Indices and tables
 ==================
 
