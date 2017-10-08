@@ -58,6 +58,62 @@ class InstanceBuilder:
         kwargs = self._components[component]["kwargs"]
         return component, type_(*args, **kwargs)
 
+class Entity:
+    """Pool of :class:`Entity` instances.
+    
+    You can access to any instance defined for this Entity.
+    Each Entity are different from each other but they have the same interface.
+    
+    This class is not meant to be used directly. See :func:`build_Entity`.
+    
+    Example:
+    
+        .. code-block:: python
+        
+            toyblock3.system('body')
+            def out_of_bounds(system, entity, bounds):
+                if not in bounds:
+                    entity.free()
+            
+            Bullet = toyblock3.build_Entity(100, builder, out_of_bounds, physics, update_sprite)
+            
+            def shoot(Bullet, x, y):
+                a_bullet = Bullet.get()
+                a_bullet.body.x = x
+                a_bullet.body.y = y
+    """
+        
+    @classmethod
+    def get(cls):
+        """Return an unused instance from its pool."""
+        entity = None
+        if cls._entities:
+            entity = cls._entities.pop()
+            cls._used.append(entity)
+            for system in cls._systems:
+                system._add_entity(entity)
+        return entity
+    
+    @classmethod
+    def _free(cls, entity):
+        cls._used.remove(entity)
+        cls._entities.append(entity)
+        for system in cls._systems:
+            system._remove_entity(entity)
+            
+    @classmethod
+    def components(cls):
+        """Get a tuple of the components defined for this :class:`Entity`."""
+        return cls._components
+    
+    def free(self):
+        """Free this entity.
+        
+        Raises:
+            NotImplementedError if :class:`Entity` is being used directly.
+        """
+        raise NotImplementedError("Do not use Entity directly. Use build_Entity.")
+        
 def build_Entity(n, instance_builder, *systems):
     """Create an custom :class:`Entity`.
     
@@ -102,60 +158,33 @@ def build_Entity(n, instance_builder, *systems):
     if not isinstance(instance_builder, InstanceBuilder):
         raise ValueError("Pass an InstanceBuilder. Found {}".format(type(n)))
 
-    class Entity:
-        """Pool of :class:`Entity` instances.
-        
-        You can access to any instance defined for this Entity.
-        Each Entity are different from each other but they have the same interface.
-        
-        """
-        __slots__ = instance_builder.components
-        
-        @classmethod
-        def get(Entity):
-            """Return an unused instance from its pool."""
-            entity = None
-            if Entity._entities:
-                entity = Entity._entities.pop()
-                Entity._used.append(entity)
-                for system in Entity._systems:
-                    system._add_entity(entity)
-            return entity
-        
-        @classmethod
-        def _free(Entity, entity):
-            Entity._used.remove(entity)
-            Entity._entities.append(entity)
-            for system in Entity._systems:
-                system._remove_entity(entity)
-                
-        @classmethod
-        def components(Entity):
-            """Get a tuple of the components defined for this :class:`Entity`."""
-            return Entity._components
-        
+    class _EntityMeta(type):
+        def __new__(cls, name, bases, dctn):
+            dctn["__slots__"] = instance_builder.components
+            return type.__new__(cls, name, (Entity,), dctn)
+    
+    class _Entity(metaclass=_EntityMeta):
         def free(self):
-            """Free this entity."""
             self.__class__._free(self)
     
-    entities = deque((Entity() for i in range(n)))
+    entities = deque((_Entity() for i in range(n)))
     for entity in entities:
         for component, instance in instance_builder:
             setattr(entity, component, instance)
     
-    Entity._components = instance_builder.components
-    Entity._entities = entities
-    Entity._used = deque()
-    Entity._systems = []
+    _Entity._components = instance_builder.components
+    _Entity._entities = entities
+    _Entity._used = deque()
+    _Entity._systems = []
     
     for system in systems:
         insert = False
         for component in instance_builder.components:
             insert = insert or component in system.components
             if not insert: continue
-            Entity._systems.append(system)
+            _Entity._systems.append(system)
     
-    return Entity
+    return _Entity
 
 class System:
     def __init__(self, *components):
