@@ -75,6 +75,24 @@ class TestEntity(unittest.TestCase):
         self.assertEqual(test.pair2.x, 7)
         self.assertEqual(test.pair2.y, 12)
 
+    def test3_entity_initclean(self):
+        
+        @self.testEntity.init
+        def init_12(entity):
+            entity.set("pair2", x=12, y=12)
+        
+        @self.testEntity.clean
+        def clean_12(entity):
+            self.assertEqual(entity.pair2.x, 12)
+            self.assertEqual(entity.pair2.y, 12)
+            
+        one = self.testEntity.get()
+        
+        self.assertEqual(one.pair2.x, 12)
+        self.assertEqual(one.pair2.y, 12)
+        
+        one.free()
+
 class TestEntityBuilder(unittest.TestCase):
     
     def test1_works_well(self):

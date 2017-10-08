@@ -59,7 +59,7 @@ class InstanceBuilder:
         return component, type_(*args, **kwargs)
 
 class Entity:
-    """Pool of :class:`Entity` instances.
+    """Type and pool of this :class:`Entity` instances.
     
     You can access to any instance defined for this Entity.
     Each Entity are different from each other but they have the same interface.
@@ -84,6 +84,9 @@ class Entity:
     """
     __slots__ = ()
         
+    _init = None
+    _clean = None
+        
     @classmethod
     def get(cls):
         """Return an unused instance from its pool."""
@@ -93,7 +96,21 @@ class Entity:
             cls._used.append(entity)
             for system in cls._systems:
                 system._add_entity(entity)
+            if cls._init is not None:
+                cls._init(entity)
         return entity
+    
+    @classmethod
+    def init(cls, init_):
+        if not callable(init_):
+            raise TypeError("Pass a callable. A {} given.".format(type(init_)))
+        cls._init = init_
+    
+    @classmethod
+    def clean(cls, clean_):
+        if not callable(clean_):
+            raise TypeError("Pass a callable. A {} given.".format(type(clean_)))
+        cls._clean = clean_
     
     @classmethod
     def _free(cls, entity):
@@ -101,6 +118,8 @@ class Entity:
         cls._entities.append(entity)
         for system in cls._systems:
             system._remove_entity(entity)
+        if cls._clean is not None:
+            cls._clean(entity)
             
     @classmethod
     def components(cls):
