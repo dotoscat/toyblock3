@@ -102,12 +102,28 @@ class Entity:
     
     @classmethod
     def init(cls, init_):
+        """The callable passed will be used each time :func:`get` is called with success.
+        
+        Parameters:
+            init_ (callable): init_(entity)
+            
+        Raises:
+            TypeError: :obj:`init_` is not a callable.
+        """
         if not callable(init_):
             raise TypeError("Pass a callable. A {} given.".format(type(init_)))
         cls._init = init_
     
     @classmethod
     def clean(cls, clean_):
+        """The callable passed will an entity from this class is freed.
+
+        Parameters:
+            clean_ (callable): clean_(entity)
+            
+        Raises:
+            TypeError: :obj:`clean_` is not a callable.
+        """
         if not callable(clean_):
             raise TypeError("Pass a callable. A {} given.".format(type(clean_)))
         cls._clean = clean_
