@@ -31,6 +31,18 @@ class TestEntity(unittest.TestCase):
             print(system, entity, n)
             
         self.a_system = a_system
+        
+        class A:
+            def __init__(self, x=0., y=0.):
+                self.x = x
+                self.y = y
+        
+        builder = toyblock3.InstanceBuilder()
+        builder.add("pair", dict, x=32, y=32)
+        builder.add("id", int, 7)
+        builder.add("pair2", A, x=7, y=7)
+    
+        self.testEntity = toyblock3.build_Entity(1, builder)
     
     def test1_entity_creation(self):
         
@@ -53,6 +65,15 @@ class TestEntity(unittest.TestCase):
         self.assertTrue(c_system._entities not in A._systems)
         self.a_system(7)
         c_system()
+        
+    def test2_entity_set(self):
+        test = self.testEntity.get()
+        test.set("pair", x=7, y=7)
+        self.assertEqual(test.pair["x"], 7)
+        self.assertEqual(test.pair["y"], 7)
+        test.set("pair2", y=12)
+        self.assertEqual(test.pair2.x, 7)
+        self.assertEqual(test.pair2.y, 12)
 
 class TestEntityBuilder(unittest.TestCase):
     

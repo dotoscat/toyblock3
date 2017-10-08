@@ -111,7 +111,32 @@ class Entity:
         """Free this entity.
         
         Raises:
-            NotImplementedError if :class:`Entity` is being used directly.
+            NotImplementedError: If :class:`Entity` is being used directly.
+        """
+        raise NotImplementedError("Do not use Entity directly. Use build_Entity.")
+        
+    def set(self, component, **kwargs):
+        """Helper method for setting attributes in a component.
+        
+        Parameters:
+            component (str): Name of the component.
+            **kwargs: keyword arguments.
+        
+        Raises:
+            NotImplementedError: If :class:`Entity` is being used directly.
+            TypeError: :obj:`component` is not a :class:`str`.
+            AttributeError:
+            
+        Example:
+        
+            .. code-block:: python
+            
+                player.set("body", x=32., y=32.)
+                
+                #  instead of
+                
+                player.body.x = 32.
+                player.body.y = 32.
         """
         raise NotImplementedError("Do not use Entity directly. Use build_Entity.")
         
@@ -168,6 +193,16 @@ def build_Entity(n, instance_builder, *systems):
 
         def free(self):
             self.__class__._free(self)
+            
+        def set(self, component, **kwargs):
+            if not isinstance(component, str):
+                raise TypeError("component is not a str. A {} is passed.".format(type(component)))
+            entity_component = getattr(self, component)
+            for key in kwargs:
+                if isinstance(entity_component, dict):
+                    entity_component[key] = kwargs[key]
+                else:
+                    setattr(entity_component, key, kwargs[key])
     
     entities = deque((_Entity() for i in range(n)))
     for entity in entities:
