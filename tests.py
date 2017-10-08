@@ -12,14 +12,14 @@ class TestSystem(unittest.TestCase):
         self.assertTrue(get_true.components == ("a", "b", "c"))
         
     def test2_wrong_attributes_list(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             @toyblock3.system({})
             def one(): pass
             @toyblock3.system(7)
             def two(): pass
             
     def test_wrong_callable(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             build_system = toyblock3.system(('a',))
             build_system(1)
 

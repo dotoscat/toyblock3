@@ -2,10 +2,10 @@ from collections import deque
 
 def _check_components_are(components, type_):
     if not (isinstance(components, tuple) or isinstance(components, list)):
-        raise ValueError("Pass a tuple or list with {}.").format(type_)
+        raise TypeError("Pass a tuple or list with {}.").format(type_)
     for component in components:
         if not isinstance(component, type_):
-            raise ValueError("Pass {} as parameters. Found a {}".format(type_, type(component)))
+            raise TypeError("Pass {} as parameters. Found a {}".format(type_, type(component)))
 
 class InstanceBuilder:
     """Define what are the components.
@@ -35,10 +35,10 @@ class InstanceBuilder:
             This instance.
         
         Raises:
-            ValueError if :obj:`component` is not a :class:`str`.
+            TypeError if :obj:`component` is not a :class:`str`.
         """
         if not isinstance(component, str):
-            raise ValueError("component must be a String type. {} given.".format(type(component)))
+            raise TypeError("component must be a String type. {} given.".format(type(component)))
         self._components[component] = {"type": type_, "args": args, "kwargs": kwargs}
         return self
 
@@ -59,7 +59,6 @@ class InstanceBuilder:
         return component, type_(*args, **kwargs)
 
 class Entity:
-    __slots__ = ()
     """Pool of :class:`Entity` instances.
     
     You can access to any instance defined for this Entity.
@@ -83,6 +82,7 @@ class Entity:
                 a_bullet.body.x = x
                 a_bullet.body.y = y
     """
+    __slots__ = ()
         
     @classmethod
     def get(cls):
@@ -132,8 +132,8 @@ def build_Entity(n, instance_builder, *systems):
         A custom :class:`Entity`.
     
     Raises:
-        ValueError: :obj:`n` is not a :class:`int`
-        ValueError: :obj:`instance_builder` is not a :class:`InstanceBuilder`.
+        TypeError: :obj:`n` is not a :class:`int`
+        TypeError: :obj:`instance_builder` is not a :class:`InstanceBuilder`.
     
     Example:
         
@@ -155,9 +155,9 @@ def build_Entity(n, instance_builder, *systems):
     """
     _check_components_are(systems, System)
     if not isinstance(n, int):
-        raise ValueError("Pass an intenger. Found {}".format(type(n)))
+        raise TypeError("Pass an intenger. Found {}".format(type(n)))
     if not isinstance(instance_builder, InstanceBuilder):
-        raise ValueError("Pass an InstanceBuilder. Found {}".format(type(instance_builder)))
+        raise TypeError("Pass an InstanceBuilder. Found {}".format(type(instance_builder)))
 
     class _EntityMeta(type):
         def __new__(cls, name, bases, dctn):
@@ -208,7 +208,7 @@ class System:
         :func:`system` decorator will set the callable for you.
         
         Raises:
-            ValueError if the object assigned is not a *callable*.
+            TypeError if the object assigned is not a *callable*.
         """
         return self._callable_
         
@@ -216,7 +216,7 @@ class System:
     def callable(self, callable_):
         if self._callable_ is None:
             if not callable(callable_):
-                raise ValueError("Use a callable object.")
+                raise TypeError("Use a callable object.")
             self._callable_ = callable_
     
     @property
@@ -280,7 +280,7 @@ def system(*components):
         *components (:class:`str`): Member names of an :class:`Entity`
     
     Raises:
-        ValueError if any component is not a :class:`str`
+        TypeError if any component is not a :class:`str`
     
     Returns:
         An instance of :class:`System`
