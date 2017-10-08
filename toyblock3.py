@@ -59,6 +59,7 @@ class InstanceBuilder:
         return component, type_(*args, **kwargs)
 
 class Entity:
+    __slots__ = ()
     """Pool of :class:`Entity` instances.
     
     You can access to any instance defined for this Entity.
@@ -156,7 +157,7 @@ def build_Entity(n, instance_builder, *systems):
     if not isinstance(n, int):
         raise ValueError("Pass an intenger. Found {}".format(type(n)))
     if not isinstance(instance_builder, InstanceBuilder):
-        raise ValueError("Pass an InstanceBuilder. Found {}".format(type(n)))
+        raise ValueError("Pass an InstanceBuilder. Found {}".format(type(instance_builder)))
 
     class _EntityMeta(type):
         def __new__(cls, name, bases, dctn):
@@ -164,6 +165,7 @@ def build_Entity(n, instance_builder, *systems):
             return type.__new__(cls, name, (Entity,), dctn)
     
     class _Entity(metaclass=_EntityMeta):
+
         def free(self):
             self.__class__._free(self)
     

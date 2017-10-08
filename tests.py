@@ -45,6 +45,7 @@ class TestEntity(unittest.TestCase):
         self.assertTrue(len(A._entities) == 10)
         self.assertTrue(isinstance(A._entities[0], A))
         a = A.get()
+        print("a", dir(a))
         a.free()
         b = A.get()
         self.assertTrue(a is b)
