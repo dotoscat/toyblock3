@@ -20,20 +20,26 @@ class Entity:
         self.__class__._free(self)
 
 class Pool(type):
-    __entities__ = set()
-    __used__ = deque()
     def __new__(cls, name, bases, namespace):
-        N = namespace.get("__pool_size__", 0)
+        N = namespace.get("POOL_SIZE", 0)
         if N == 0:
-            namespace["__pool_size__"] = N
+            namespace["POOL_SIZE"] = N
         new_class = super().__new__(cls, name, bases + (Entity,), namespace)
+        new_class.__entities__ = deque()
+        new_class.__used__ = deque()
+        for i in range(N):
+            new_class.__entities__.append(new_class())
         return new_class
 
     def _free(self, entity):
         print("free", entity)
         
     def __call__(self, *args, **kwargs):
-        return super().__call__(*args, **kwargs)
+        if self.POOL_SIZE != len(self.__entities__):
+            return super().__call__(*args, **kwargs)
+        entity = self.__entities__.pop()
+        self.__used__.append(entity)
+        return entity
 
 class System:
     def __init__(self):

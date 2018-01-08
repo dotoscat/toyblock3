@@ -26,9 +26,11 @@ class TestPool(unittest.TestCase):
     def test1_pool_creation(self):
         
         class B(metaclass=toyblock3.Pool):
+            POOL_SIZE = 3
             pass
         
         class C(metaclass=toyblock3.Pool):
+            POOL_SIZE = 7
             pass
         
         print("class B", B)
@@ -37,5 +39,5 @@ class TestPool(unittest.TestCase):
         c = C()
         b.free()
         
-        print(B.__pool_size__, C.__pool_size__)
+        print(B.POOL_SIZE, C.__pool_size__)
         
