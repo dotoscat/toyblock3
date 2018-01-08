@@ -14,10 +14,28 @@ class TestSystem(unittest.TestCase):
     def test2_implemented(self):
         
         class MySystem(toyblock3.System):
-            def _update(self, entity, *args, **kwargs):
+            def _update(self, entity):
                 print("Hola mundo")
                 
         system = MySystem()
         system.add_entity(A())
         system()
+        
+class TestPool(unittest.TestCase):
+    
+    def test1_pool_creation(self):
+        
+        class B(metaclass=toyblock3.Pool):
+            pass
+        
+        class C(metaclass=toyblock3.Pool):
+            pass
+        
+        print("class B", B)
+        
+        b = B()
+        c = C()
+        b.free()
+        
+        print(B.__pool_size__, C.__pool_size__)
         

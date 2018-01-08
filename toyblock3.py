@@ -16,14 +16,24 @@
 from collections import deque
 
 class Entity:
-    def __init__(self):
-        self.systems = set()
+    def free(self):
+        self.__class__._free(self)
 
-    def add_system(self, system):
-        pass
+class Pool(type):
+    __entities__ = set()
+    __used__ = deque()
+    def __new__(cls, name, bases, namespace):
+        N = namespace.get("__pool_size__", 0)
+        if N == 0:
+            namespace["__pool_size__"] = N
+        new_class = super().__new__(cls, name, bases + (Entity,), namespace)
+        return new_class
+
+    def _free(self, entity):
+        print("free", entity)
         
-    def remove_system(self, system):
-        pass
+    def __call__(self, *args, **kwargs):
+        return super().__call__(*args, **kwargs)
 
 class System:
     def __init__(self):
@@ -56,14 +66,12 @@ class System:
         
             .. code-block:: python
             
-                @toyblock3.system('body')
-                def physics(system, entity, dt):
-                    entity.body.update(dt)
-                    for other_entity in system.entities:
-                        check_collision_with(entity, other_entity)
-                        #  more stuff
-                    
-                #  Add some entities to this system.
+                class PhysicsSystem(toyblock3.System):
+                    def _update(self, entity, dt):
+                        entity.body.update(dt)
+                        
+                physics = PhysicsSystem()
+                physics.add_entity(player)
                 
                 while not game_over:
                     physics(get_dt_time())
