@@ -22,11 +22,15 @@ class Entity:
         self.__class__._free(self)
         
     def reset(self):
-        """This reset will be called when free is called."""
+        """This reset will be called when :meth:`free` is called.
+        
+        Raises:
+            NotImplementedError
+        """
         raise NotImplementedError("Define the reset method for this Entity.")
 
 class Pool(type):
-    """Metaclass to convert any class in a pool of its type.
+    """Metaclass to convert any class in a pool of its type and inherits from :class:`Entity`.
     
     Get an object from this pool just creating an instance. This instance
     has the *free* method.
@@ -35,11 +39,15 @@ class Pool(type):
     
     Example:
     
-        .. code-block: :python
+        .. code-block:: python
         
-            class Body:
+            class Body(metaclass=Pool):
                 POOL_SIZE = 16
                 def __init__(self):
+                    self.x = 0
+                    self.y = 0
+                    
+                def reset(self):
                     self.x = 0
                     self.y = 0
         
@@ -54,24 +62,26 @@ class Pool(type):
         if N == 0:
             namespace["POOL_SIZE"] = N
         new_class = super().__new__(cls, name, bases + (Entity,), namespace)
-        new_class.__entities__ = deque()
-        new_class.__used__ = deque()
+        new_class.__entities = deque()
+        new_class.__used = deque()
         new_class.__ready = False
         for i in range(N):
-            new_class.__entities__.append(new_class())
+            new_class.__entities.append(new_class())
         new_class.__ready = True
         return new_class
 
     def _free(self, entity):
         entity.reset()
-        self.__used__.remove(entity)
-        self.__entities__.appendleft(entity)
+        self.__used.remove(entity)
+        self.__entities.appendleft(entity)
         
     def __call__(self, *args, **kwargs):
+        """Return an instance from its pool. None if there is not an avaliable entity."""
         if not self.__ready:
             return super().__call__(*args, **kwargs)
-        entity = self.__entities__.pop()
-        self.__used__.append(entity)
+        if not self.__entities: return None
+        entity = self.__entities.pop()
+        self.__used.append(entity)
         return entity
 
 class System:

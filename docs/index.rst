@@ -10,16 +10,16 @@ Welcome to toyblock3's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-.. autofunction:: toyblock3.system
+Toyblock3 is a small Entity-Component System. It just provides tools to
+contruct systems and helps you to contruct entities.
+
+.. automodule:: toyblock3
 
 .. autoclass:: toyblock3.System
     :members:
-    :special-members: __call__
 
-.. autoclass:: toyblock3.InstanceBuilder
+.. autoclass:: toyblock3.Pool
     :members:
-
-.. autofunction:: toyblock3.build_Entity
 
 .. autoclass:: toyblock3.Entity
     :members:
