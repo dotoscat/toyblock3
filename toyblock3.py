@@ -16,10 +16,33 @@
 from collections import deque
 
 class Entity:
+    """This is a mixin to add the free method to a class."""
     def free(self):
         self.__class__._free(self)
 
 class Pool(type):
+    """Metaclass to convert any class in a pool of its type.
+    
+    Get an object from this pool just creating an instance. This instance
+    has the *free* method.
+    
+    To define the size of this pool the class must have the POOL_SIZE member.
+    
+    Example:
+    
+        .. code-block: :python
+        class Body:
+            POOL_SIZE = 16
+            def __init__(self):
+                self.x = 0
+                self.y = 0
+        
+        one = Body()
+        two = Body()
+        one.free()
+        two.free()
+        
+    """
     def __new__(cls, name, bases, namespace):
         N = namespace.get("POOL_SIZE", 0)
         if N == 0:

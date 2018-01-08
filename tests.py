@@ -40,4 +40,15 @@ class TestPool(unittest.TestCase):
         b.free()
         
         print(B.POOL_SIZE, C.POOL_SIZE)
+    
+    def test2_pool_instances(self):
         
+        class Basket(metaclass=toyblock3.Pool):
+            """A basquet pool with 8 entities."""
+            POOL_SIZE = 8
+            def __init__(self):
+                self.banana = 0
+                self.apple = 0
+                
+        a_basquet = Basquet()
+        a_basquet.free()
