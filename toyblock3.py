@@ -27,15 +27,18 @@ class Pool(type):
         new_class = super().__new__(cls, name, bases + (Entity,), namespace)
         new_class.__entities__ = deque()
         new_class.__used__ = deque()
+        new_class.__ready = False
         for i in range(N):
             new_class.__entities__.append(new_class())
+        new_class.__ready = True
         return new_class
 
     def _free(self, entity):
-        print("free", entity)
+        self.__used__.remove(entity)
+        self.__entities__.appendleft(entity)
         
     def __call__(self, *args, **kwargs):
-        if self.POOL_SIZE != len(self.__entities__):
+        if not self.__ready:
             return super().__call__(*args, **kwargs)
         entity = self.__entities__.pop()
         self.__used__.append(entity)

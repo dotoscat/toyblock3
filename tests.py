@@ -39,5 +39,5 @@ class TestPool(unittest.TestCase):
         c = C()
         b.free()
         
-        print(B.POOL_SIZE, C.__pool_size__)
+        print(B.POOL_SIZE, C.POOL_SIZE)
         
