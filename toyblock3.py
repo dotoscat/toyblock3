@@ -16,9 +16,14 @@
 from collections import deque
 
 class Entity:
-    """This is a mixin to add the free method to a class."""
+    """This is a abstract class to be used with :class:`Pool`."""
     def free(self):
+        """Return this entity to its pool."""
         self.__class__._free(self)
+        
+    def reset(self):
+        """This reset will be called when free is called."""
+        raise NotImplementedError("Define the reset method for this Entity.")
 
 class Pool(type):
     """Metaclass to convert any class in a pool of its type.
@@ -57,6 +62,7 @@ class Pool(type):
         return new_class
 
     def _free(self, entity):
+        entity.reset()
         self.__used__.remove(entity)
         self.__entities__.appendleft(entity)
         

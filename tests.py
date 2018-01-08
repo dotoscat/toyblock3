@@ -27,11 +27,12 @@ class TestPool(unittest.TestCase):
         
         class B(metaclass=toyblock3.Pool):
             POOL_SIZE = 3
-            pass
+            def reset(self): pass
         
         class C(metaclass=toyblock3.Pool):
             POOL_SIZE = 7
-            pass
+            
+            def reset(self): pass
         
         print("class B", B)
         
@@ -49,6 +50,9 @@ class TestPool(unittest.TestCase):
             def __init__(self):
                 self.banana = 0
                 self.apple = 0
+            def reset(self):
+                self.babana = 0
+                self.apple = 0
                 
-        a_basquet = Basquet()
+        a_basquet = Basket()
         a_basquet.free()
