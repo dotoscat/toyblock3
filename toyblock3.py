@@ -36,16 +36,17 @@ class Pool(type):
     Example:
     
         .. code-block: :python
-        class Body:
-            POOL_SIZE = 16
-            def __init__(self):
-                self.x = 0
-                self.y = 0
         
-        one = Body()
-        two = Body()
-        one.free()
-        two.free()
+            class Body:
+                POOL_SIZE = 16
+                def __init__(self):
+                    self.x = 0
+                    self.y = 0
+        
+            one = Body()
+            two = Body()
+            one.free()
+            two.free()
         
     """
     def __new__(cls, name, bases, namespace):
