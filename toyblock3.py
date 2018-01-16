@@ -15,34 +15,29 @@
 
 from collections import deque
 
-class Entity:
-    """This is a abstract class to be used with :class:`Pool`."""
+class Poolable:
+    __pool = None
     def free(self):
-        """Return this entity to its pool."""
-        self.__class__._free(self)
-        
+        if not self.__pool:
+            return
+        self.__pool.free(self)
     def reset(self):
-        """This reset will be called when :meth:`free` is called.
-        
-        Raises:
-            NotImplementedError
-        """
-        raise NotImplementedError("Define the reset method for this Entity.")
+        raise NotImplementedError("Implement reset for this Poolable")
+    @classmethod
+    def set_pool(cls, pool):
+        cls.__pool = pool
 
-class Pool(type):
-    """Metaclass to convert any class in a pool of its type and inherits from :class:`Entity`.
+class Pool:
+    """Create an pool object with any class that is *Poolable*.
     
     Get an object from this pool just creating an instance. This instance
     has the *free* method.
-    
-    To define the size of this pool the class must have the POOL_SIZE member.
     
     Example:
     
         .. code-block:: python
         
-            class Body(metaclass=Pool):
-                POOL_SIZE = 16
+            class Body(Poolable):
                 def __init__(self):
                     self.x = 0
                     self.y = 0
@@ -51,37 +46,45 @@ class Pool(type):
                     self.x = 0
                     self.y = 0
         
-            one = Body()
-            two = Body()
+            body_pool = Pool(Body, 10)
+
+            one = body_pool()
+            two = body_pool()
             one.free()
             two.free()
         
     """
-    def __new__(cls, name, bases, namespace):
-        N = namespace.get("POOL_SIZE", 0)
-        if N == 0:
-            namespace["POOL_SIZE"] = N
-        new_class = super().__new__(cls, name, bases + (Entity,), namespace)
-        new_class.__entities = deque()
-        new_class.__used = deque()
-        new_class.__ready = False
-        for i in range(N):
-            new_class.__entities.append(new_class())
-        new_class.__ready = True
-        return new_class
+    def __init__(self, poolable, n_entities, *args, **kwargs):
+        """Create a pool of n_entities with a *poolable* class.
 
-    def _free(self, entity):
+        Parameters:
+            poolable (:class:`Poolable`): Any class which inherits from Poolable.
+            n_entities (int): Number of entities for this pool
+            *args: args for creating the instances.
+            **kwargs: kwargs for creating the instances.
+
+        Raises:
+            TypeError if the class is not poolable
+        """
+        if not issubclass(poolable, Poolable):
+            raise TypeError("Type passed is not poolable")
+        self.entities = deque([poolable(*args, **kwargs) for i in range(n_entities)])
+        self.used = deque()
+        poolable.set_pool(self)
+
+    def free(self, entity):
+        if entity not in self.used:
+            return
         entity.reset()
-        self.__used.remove(entity)
-        self.__entities.appendleft(entity)
+        self.used.remove(entity)
+        self.entities.append(entity)
         
     def __call__(self, *args, **kwargs):
         """Return an instance from its pool. None if there is not an avaliable entity."""
-        if not self.__ready:
-            return super().__call__(*args, **kwargs)
-        if not self.__entities: return None
-        entity = self.__entities.pop()
-        self.__used.append(entity)
+        if not self.entities:
+            return None
+        entity = self.entities.pop()
+        self.used.append(entity)
         return entity
 
 class System:
@@ -108,22 +111,26 @@ class System:
         else:
             self._entities.remove(entity)
     
-    def __call__(self, *args, **kwargs):
+    def __call__(self):
         """Call the system to compute the entities.
         
         Example:
         
             .. code-block:: python
             
-                class PhysicsSystem(toyblock3.System):
-                    def _update(self, entity, dt):
-                        entity.body.update(dt)
+                class PhysicsSystem(toyblock3.System, dt):
+                    def __init__(self):
+                        super().__init__()
+                        self.dt = dt
+
+                    def _update(self, entity):
+                        entity.body.update(self.dt)
                         
-                physics = PhysicsSystem()
+                physics = PhysicsSystem(STEP)
                 physics.add_entity(player)
                 
                 while not game_over:
-                    physics(get_dt_time())
+                    physics()
         
         """
         if self._locked: return
@@ -131,12 +138,12 @@ class System:
         update = self._update
         self._locked = True
         for entity in entities:
-            update(entity, *args, **kwargs)
+            update(entity)
         self._locked = False
         while self._remove_entity_list:
             self._entities.remove(self._remove_entity_list.pop())
         while self._add_entity_list:
             self._entities.append(self._add_entity_list.pop())
 
-    def _update(self, entity, *args, **kwargs):
+    def _update(self, entity):
         raise NotImplementedError("Define an _update method for this system.")
