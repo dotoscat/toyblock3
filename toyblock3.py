@@ -26,8 +26,11 @@ class Poolable:
 
 def make_poolable(cls):
     """Make a class ready to be poolable."""
-    PoolableClass = type(cls.__name__, (Poolable, cls), {})
-    return PoolableClass
+    reset_method = getattr(cls, "reset", None)
+    if not (callable(reset_method) and reset_method.__code__.co_argcount):
+        raise NotImplementedError("Implement the reset method for {}".format(cls.__name__))
+    poolable_class = type(cls.__name__, (Poolable, cls), {})
+    return poolable_class 
 
 class Pool:
     """Create an pool object with any class that is *Poolable*.

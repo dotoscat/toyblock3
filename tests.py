@@ -29,6 +29,8 @@ class TestPool(unittest.TestCase):
             def __init__(self, a, b):
                 self.a = a
                 self.b = b
+            def reset(self):
+                pass
 
         self.assertTrue(issubclass(Rectangle, toyblock3.Poolable))
 
