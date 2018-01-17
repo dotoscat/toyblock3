@@ -16,16 +16,18 @@
 from collections import deque
 
 class Poolable:
-    __pool = None
+    def __init__(self, pool, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__pool = pool
     def free(self):
-        if not self.__pool:
-            return
         self.__pool.free(self)
     def reset(self):
         raise NotImplementedError("Implement reset for this Poolable")
-    @classmethod
-    def set_pool(cls, pool):
-        cls.__pool = pool
+
+def make_poolable(cls):
+    """Make a class ready to be poolable."""
+    PoolableClass = type(cls.__name__, (Poolable, cls), {})
+    return PoolableClass
 
 class Pool:
     """Create an pool object with any class that is *Poolable*.
@@ -68,9 +70,8 @@ class Pool:
         """
         if not issubclass(poolable, Poolable):
             raise TypeError("Type passed is not poolable")
-        self.entities = deque([poolable(*args, **kwargs) for i in range(n_entities)])
+        self.entities = deque([poolable(self, *args, **kwargs) for i in range(n_entities)])
         self.used = deque()
-        poolable.set_pool(self)
 
     def free(self, entity):
         if entity not in self.used:

@@ -22,37 +22,16 @@ class TestSystem(unittest.TestCase):
         system()
         
 class TestPool(unittest.TestCase):
-    
-    def test1_pool_creation(self):
+
+    def test1_poolable(self):
+        @toyblock3.make_poolable
+        class Rectangle:
+            def __init__(self, a, b):
+                self.a = a
+                self.b = b
+
+        self.assertTrue(issubclass(Rectangle, toyblock3.Poolable))
+
+        RectanglePool = toyblock3.Pool(Rectangle, 8, 0, 0)
+        self.assertEqual(len(RectanglePool.entities), 8, "There are not 8 rectangles")
         
-        class B(metaclass=toyblock3.Pool):
-            POOL_SIZE = 3
-            def reset(self): pass
-        
-        class C(metaclass=toyblock3.Pool):
-            POOL_SIZE = 7
-            
-            def reset(self): pass
-        
-        print("class B", B)
-        
-        b = B()
-        c = C()
-        b.free()
-        
-        print(B.POOL_SIZE, C.POOL_SIZE)
-    
-    def test2_pool_instances(self):
-        
-        class Basket(metaclass=toyblock3.Pool):
-            """A basquet pool with 8 entities."""
-            POOL_SIZE = 8
-            def __init__(self):
-                self.banana = 0
-                self.apple = 0
-            def reset(self):
-                self.babana = 0
-                self.apple = 0
-                
-        a_basquet = Basket()
-        a_basquet.free()
