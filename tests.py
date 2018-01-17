@@ -32,6 +32,8 @@ class TestPool(unittest.TestCase):
 
         self.assertTrue(issubclass(Rectangle, toyblock3.Poolable))
 
-        RectanglePool = toyblock3.Pool(Rectangle, 8, 0, 0)
+        RectanglePool = toyblock3.Pool(Rectangle, 8, 7, 12)
         self.assertEqual(len(RectanglePool.entities), 8, "There are not 8 rectangles")
-        
+        rect = RectanglePool()
+        self.assertEqual(rect.a, 7, "Rect a is not equal to 7")
+        self.assertEqual(rect.b, 12, "Rect a is not equal to 12")
