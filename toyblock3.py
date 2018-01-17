@@ -25,7 +25,14 @@ class Poolable:
         raise NotImplementedError("Implement reset for this Poolable")
 
 def make_poolable(cls):
-    """Make a class ready to be poolable."""
+    """Make a class ready to be poolable.
+    
+    Returns:
+        A :class:`Poolable`.
+
+    Raises:
+        NotImplementedError if :meth:`reset` is not implemented.
+    """
     reset_method = getattr(cls, "reset", None)
     if not (callable(reset_method) and reset_method.__code__.co_argcount):
         raise NotImplementedError("Implement the reset method for {}".format(cls.__name__))
