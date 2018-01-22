@@ -15,14 +15,16 @@
 
 from collections import deque
 
-class Poolable:
+class PoolableMixin:
+    """Provide mechanisms to be used by :class:`Pool`.
+
+    Don't use this class directly.
+    """
     def __init__(self, pool, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.__pool = pool
     def free(self):
         self.__pool.free(self)
-    def reset(self):
-        raise NotImplementedError("Implement reset for this Poolable")
 
 def make_poolable(cls):
     """Make a class ready to be poolable.
@@ -36,12 +38,24 @@ def make_poolable(cls):
     reset_method = getattr(cls, "reset", None)
     if not (callable(reset_method) and reset_method.__code__.co_argcount):
         raise NotImplementedError("Implement the reset method for {}".format(cls.__name__))
-    poolable_class = type(cls.__name__, (Poolable, cls), {})
+    poolable_class = type(cls.__name__, (PoolableMixin, cls), {})
     return poolable_class 
 
 class Pool:
-    """Create an pool object with any class that is *Poolable*.
-    
+    """
+    Create a pool of :class:`class_` n_entities.
+
+    Any class passed by parameter it will be mixed with :class:`PoolableMixin`
+
+    Parameters:
+        class (type): Any class.
+        n_entities (int): Number of entities for this pool
+        *args: args for creating the instances.
+        **kwargs: kwargs for creating the instances.
+
+    Raises:
+        NotImplementedError if the class has not implemented method:`reset`.
+
     Get an object from this pool just creating an instance. This instance
     has the *free* method.
     
@@ -66,21 +80,25 @@ class Pool:
             two.free()
         
     """
-    def __init__(self, poolable, n_entities, *args, **kwargs):
-        """Create a pool of n_entities with a *poolable* class.
+    def __init__(self, class_, n_entities, *args, **kwargs):
+        """Create a pool of :class:`class_` n_entities.
+
+        Any class passed by parameter it will be mixed with :class:`PoolableMixin`
 
         Parameters:
-            poolable (:class:`Poolable`): Any class which inherits from Poolable.
+            class (type): Any class.
             n_entities (int): Number of entities for this pool
             *args: args for creating the instances.
             **kwargs: kwargs for creating the instances.
 
         Raises:
-            TypeError if the class is not poolable
+            NotImplementedError if the class has not implemented method:`reset`.
         """
-        if not issubclass(poolable, Poolable):
-            raise TypeError("Type passed is not poolable")
-        self.entities = deque([poolable(self, *args, **kwargs) for i in range(n_entities)])
+        reset_method = getattr(class_, "reset", None)
+        if not (callable(reset_method) and reset_method.__code__.co_argcount):
+            raise NotImplementedError("Implement the reset method for {}".format(class_.__name__))
+        poolable_class = type(class_.__name__, (PoolableMixin, class_), {})
+        self.entities = deque([poolable_class(self, *args, **kwargs) for i in range(n_entities)])
         self.used = deque()
 
     def free(self, entity):
@@ -158,3 +176,16 @@ class System:
 
     def _update(self, entity):
         raise NotImplementedError("Define an _update method for this system.")
+
+class ManagedEntityMixin:
+    def reset(self):
+        super().reset()
+        print("Systems", self.SYSTEMS)
+        for system in self.SYSTEMS:
+            pass
+            # TODO: Remove entity from each system
+
+class Manager:
+    def __init__(self, poolable, n_entities, *args, **kwargs):
+        managed_poolable = type(poolable.__name__, (ManagedEntityMixin, poolable), {})
+        
