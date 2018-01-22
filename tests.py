@@ -41,3 +41,6 @@ class TestPool(unittest.TestCase):
         self.assertEqual(rect.a, 7, "Rect a is not equal to 7")
         self.assertEqual(rect.b, 12, "Rect a is not equal to 12")
         rect.reset()
+        rect.free()
+        rect.free()
+        self.assertEqual(len(RectanglePool.entities), 8, "There are not 8 rectangles")

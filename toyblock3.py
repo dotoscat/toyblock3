@@ -16,14 +16,18 @@
 from collections import deque
 
 class PoolableMixin:
-    """Provide mechanisms to be used by :class:`Pool`.
+    slots = ("__pool", "_used")
+    """Provide mechanisms to be used by a :class:`Pool`.
 
     Don't use this class directly.
     """
     def __init__(self, pool, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.__pool = pool
+        self._used = False
     def free(self):
+        if not self._used:
+            return
         self.__pool.free(self)
 
 class Pool:
@@ -71,13 +75,10 @@ class Pool:
             raise NotImplementedError("Implement the reset method for {}".format(class_.__name__))
         poolable_class = type(class_.__name__, (PoolableMixin, class_), {})
         self.entities = deque([poolable_class(self, *args, **kwargs) for i in range(n_entities)])
-        self.used = deque()
 
     def free(self, entity):
-        if entity not in self.used:
-            return
         entity.reset()
-        self.used.remove(entity)
+        entity._used = False
         self.entities.append(entity)
         
     def __call__(self, *args, **kwargs):
@@ -85,7 +86,7 @@ class Pool:
         if not self.entities:
             return None
         entity = self.entities.pop()
-        self.used.append(entity)
+        entity._used = True
         return entity
 
 class System:
