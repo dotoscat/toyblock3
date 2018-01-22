@@ -32,6 +32,9 @@ class Pool:
 
     Any class passed by parameter it will be mixed with :class:`PoolableMixin`
 
+    Get an object from this pool just creating an instance. This instance
+    has the *free* method.
+
     Parameters:
         class (type): Any class.
         n_entities (int): Number of entities for this pool
@@ -41,9 +44,6 @@ class Pool:
     Raises:
         NotImplementedError if the class has not implemented method:`reset`.
 
-    Get an object from this pool just creating an instance. This instance
-    has the *free* method.
-    
     Example:
     
         .. code-block:: python
@@ -66,19 +66,6 @@ class Pool:
         
     """
     def __init__(self, class_, n_entities, *args, **kwargs):
-        """Create a pool of :class:`class_` n_entities.
-
-        Any class passed by parameter it will be mixed with :class:`PoolableMixin`
-
-        Parameters:
-            class (type): Any class.
-            n_entities (int): Number of entities for this pool
-            *args: args for creating the instances.
-            **kwargs: kwargs for creating the instances.
-
-        Raises:
-            NotImplementedError if the class has not implemented method:`reset`.
-        """
         reset_method = getattr(class_, "reset", None)
         if not (callable(reset_method) and reset_method.__code__.co_argcount):
             raise NotImplementedError("Implement the reset method for {}".format(class_.__name__))
