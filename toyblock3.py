@@ -26,21 +26,6 @@ class PoolableMixin:
     def free(self):
         self.__pool.free(self)
 
-def make_poolable(cls):
-    """Make a class ready to be poolable.
-    
-    Returns:
-        A :class:`Poolable`.
-
-    Raises:
-        NotImplementedError if :meth:`reset` is not implemented.
-    """
-    reset_method = getattr(cls, "reset", None)
-    if not (callable(reset_method) and reset_method.__code__.co_argcount):
-        raise NotImplementedError("Implement the reset method for {}".format(cls.__name__))
-    poolable_class = type(cls.__name__, (PoolableMixin, cls), {})
-    return poolable_class 
-
 class Pool:
     """
     Create a pool of :class:`class_` n_entities.

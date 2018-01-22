@@ -24,7 +24,6 @@ class TestSystem(unittest.TestCase):
 class TestPool(unittest.TestCase):
 
     def test1_poolable(self):
-        #@toyblock3.make_poolable
         class Rectangle:
             def __init__(self, a, b):
                 self.a = a
@@ -32,7 +31,11 @@ class TestPool(unittest.TestCase):
             def reset(self):
                 pass
 
+        class RectangleWoReset:
+           pass
+
         RectanglePool = toyblock3.Pool(Rectangle, 8, 7, 12)
+        other_rect = self.assertRaises(NotImplementedError, toyblock3.Pool, RectangleWoReset, 4)
         self.assertEqual(len(RectanglePool.entities), 8, "There are not 8 rectangles")
         rect = RectanglePool()
         self.assertEqual(rect.a, 7, "Rect a is not equal to 7")
