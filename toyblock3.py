@@ -177,6 +177,8 @@ class Manager:
     The manager provides mechanisms that will do all from above for you, cleanly. This
     will create a pool for you and will mix in :class:`ManagedEntityMixin` with the class_.
 
+    You can retrive an instance from the :class:Manager in the same way as :class:Pool.
+
     Parameters:
         class_ (type): The class to use.
         n_entities (int): Number of entities for the pool.
