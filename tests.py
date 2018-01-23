@@ -44,3 +44,35 @@ class TestPool(unittest.TestCase):
         rect.free()
         rect.free()
         self.assertEqual(len(RectanglePool.entities), 8, "There are not 8 rectangles")
+
+class ManagerTest(unittest.TestCase):
+    def test1_manager(self):
+
+        class IncrementSystem(toyblock3.System):
+            def _update(self, entity):
+                entity.value += 1
+
+        increment_system = IncrementSystem()
+
+        class PrintSystem(toyblock3.System):
+            def _update(self, entity):
+                print(entity, entity.value)
+
+        print_system = PrintSystem()
+
+        class Box:
+            DEFAULT_VALUE = 0
+            SYSTEMS = (increment_system, print_system)
+            def __init__(self, value=0):
+                self.value = value
+            def reset(self):
+                self.value = self.DEFAULT_VALUE
+                print("reset value", self.value)
+
+        box_manager = toyblock3.Manager(Box, 4, 7)
+        a_box = box_manager()
+        increment_system()
+        print_system()
+        a_box.free() 
+        increment_system()
+        print_system()

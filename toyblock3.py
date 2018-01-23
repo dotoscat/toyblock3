@@ -16,11 +16,11 @@
 from collections import deque
 
 class PoolableMixin:
-    slots = ("__pool", "_used")
     """Provide mechanisms to be used by a :class:`Pool`.
 
     Don't use this class directly.
     """
+    slots = ("__pool", "_used")
     def __init__(self, pool, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.__pool = pool
@@ -135,7 +135,8 @@ class System:
                     physics()
         
         """
-        if self._locked: return
+        if self._locked:
+            return
         entities = self._entities
         update = self._update
         self._locked = True
@@ -151,14 +152,29 @@ class System:
         raise NotImplementedError("Define an _update method for this system.")
 
 class ManagedEntityMixin:
+    """This mixin is used internally by :class:`Manager`.
+    
+    Don't use this class directly.
+    """
     def reset(self):
         super().reset()
         print("Systems", self.SYSTEMS)
         for system in self.SYSTEMS:
-            pass
-            # TODO: Remove entity from each system
+            system.remove_entity(self)
 
 class Manager:
-    def __init__(self, poolable, n_entities, *args, **kwargs):
-        managed_poolable = type(poolable.__name__, (ManagedEntityMixin, poolable), {})
+    def __init__(self, class_, n_entities, *args, **kwargs):
+        systems = getattr(class_, "SYSTEMS", None)
+        if not isinstance(systems, (tuple, list)):
+            raise AttributeError("Implement SYSTEMS attribute as a list or tuple") 
+        managed_class = type(class_.__name__, (ManagedEntityMixin, class_), {})
+        self.pool = Pool(managed_class, n_entities, *args, **kwargs)
+        self.systems = systems
         
+    def __call__(self, *args, **kwargs):
+        entity = self.pool()
+        if not entity:
+            return entity
+        for system in self.systems:
+            system.add_entity(entity)
+        return entity
