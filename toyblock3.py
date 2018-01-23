@@ -158,11 +158,18 @@ class ManagedEntityMixin:
     """
     def reset(self):
         super().reset()
-        print("Systems", self.SYSTEMS)
         for system in self.SYSTEMS:
             system.remove_entity(self)
 
 class Manager:
+    """A convenient class to manager entities and systems.
+    
+    Normally you will retrieve an entity from a pool and add it to some systems, then
+    when you are done with that entity call its :method:`free` from inside any system
+    which it belongs and finally remove the entity from the systems...
+
+    The manager provides mechanisms that will do all from above for you, cleanly.
+    """
     def __init__(self, class_, n_entities, *args, **kwargs):
         systems = getattr(class_, "SYSTEMS", None)
         if not isinstance(systems, (tuple, list)):
