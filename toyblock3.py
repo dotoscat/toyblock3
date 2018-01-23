@@ -26,6 +26,7 @@ class PoolableMixin:
         self.__pool = pool
         self._used = False
     def free(self):
+        """Free this entity."""
         if not self._used:
             return
         self.__pool.free(self)
