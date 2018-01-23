@@ -52,7 +52,7 @@ class Pool:
     
         .. code-block:: python
         
-            class Body(Poolable):
+            class Body:
                 def __init__(self):
                     self.x = 0
                     self.y = 0
@@ -90,6 +90,7 @@ class Pool:
         return entity
 
 class System:
+    """This is an abstract class which your systems will derive from this."""
     def __init__(self):
         self._entities = deque()
         self._locked = False
@@ -102,12 +103,17 @@ class System:
         return self._entities
     
     def add_entity(self, entity):
+        """Add an entity to this system."""
         if self._locked:
             self._add_entity_list.append(entity)
         else:
             self._entities.append(entity)
     
     def remove_entity(self, entity):
+        """Remove an entity from entity.
+        
+        If your entity has implemented the :method:`free` then call it instead.
+        """
         if self._locked:
             self._remove_entity_list.append(entity)
         else:
@@ -162,18 +168,29 @@ class ManagedEntityMixin:
             system.remove_entity(self)
 
 class Manager:
-    """A convenient class to manager entities and systems.
+    """A convenient class to manage entities from pools and systems.
     
     Normally you will retrieve an entity from a pool and add it to some systems, then
     when you are done with that entity call its :method:`free` from inside any system
-    which it belongs and finally remove the entity from the systems...
+    which it belongs and finally remove that entity from the systems...
 
-    The manager provides mechanisms that will do all from above for you, cleanly.
+    The manager provides mechanisms that will do all from above for you, cleanly. This
+    will create a pool for you and will mix in :class:`ManagedEntityMixin` with the class_.
+
+    Parameters:
+        class_ (type): The class to use.
+        n_entities (int): Number of entities for the pool.
+        *args: Args for the Pool.
+        **kwargs: Kwargs for the Pool.
+
+    Raises:
+        AttributeError: if the class_ has not `SYSTEMS`
+
     """
     def __init__(self, class_, n_entities, *args, **kwargs):
         systems = getattr(class_, "SYSTEMS", None)
         if not isinstance(systems, (tuple, list)):
-            raise AttributeError("Implement SYSTEMS attribute as a list or tuple") 
+            raise AttributeError("Implement SYSTEMS attribute as a list or tuple for {}".format(class_.__name__)) 
         managed_class = type(class_.__name__, (ManagedEntityMixin, class_), {})
         self.pool = Pool(managed_class, n_entities, *args, **kwargs)
         self.systems = systems
