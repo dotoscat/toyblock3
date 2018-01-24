@@ -20,7 +20,7 @@ class PoolableMixin:
 
     Don't use this class directly.
     """
-    slots = ("__pool", "_used")
+    __slots__ = ("__pool", "_used")
     def __init__(self, pool, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.__pool = pool
