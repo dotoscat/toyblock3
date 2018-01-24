@@ -45,7 +45,7 @@ Example of use
         SYSTEMS = (physics_system, pit_system, sprite_system)
         Body = MyBody
         def __init__(self, x=0., y=0.):
-            self.body = self.Body
+            self.body = self.Body()
             self.sprite = Sprite("hero")
         def reset(self):
             self.body.x = 32.
