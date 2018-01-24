@@ -13,16 +13,19 @@ Welcome to toyblock3's documentation!
 Toyblock3 is a small Entity-Component System. It just provides tools to
 contruct systems and helps you to contruct entities.
 
-.. automodule:: toyblock3
-
 .. autoclass:: toyblock3.System
     :members:
+    :special-members:
 
 .. autoclass:: toyblock3.Pool
     :members:
 
-.. autoclass:: toyblock3.Entity
+.. autoclass: toyblock3.PoolableMixin
     :members:
+
+.. autoclass:: toyblock3.Manager
+    :members:
+    :special-members:
 
 Indices and tables
 ==================

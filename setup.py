@@ -2,8 +2,8 @@ from setuptools import setup
 
 setup(
     name='toyblock3',
-    version='1.0.0',
-    description='A pythonic Entity-Component System pythonic written in pure Python',
+    version='1.0.1',
+    description='A pythonic Entity-Component System written in pure Python',
     url='https://github.com/dotoscat/toyblock3',
     author='Oscar \'dotoscat\' Triano',
     license='LGPL-3.0',

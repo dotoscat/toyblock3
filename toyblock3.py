@@ -47,7 +47,7 @@ class Pool:
         **kwargs: kwargs for creating the instances.
 
     Raises:
-        NotImplementedError if the class has not implemented method:`reset`.
+        NotImplementedError: if the class has not implemented :meth:`reset`.
 
     Example:
     
@@ -113,7 +113,7 @@ class System:
     def remove_entity(self, entity):
         """Remove an entity from entity.
         
-        If your entity has implemented the :method:`free` then call it instead.
+        If your entity has implemented the :meth:`free` then call it instead.
         """
         if self._locked:
             self._remove_entity_list.append(entity)
@@ -172,13 +172,15 @@ class Manager:
     """A convenient class to manage entities from pools and systems.
     
     Normally you will retrieve an entity from a pool and add it to some systems, then
-    when you are done with that entity call its :method:`free` from inside any system
+    when you are done with that entity call its :meth:`free` from inside any system
     which it belongs and finally remove that entity from the systems...
 
     The manager provides mechanisms that will do all from above for you, cleanly. This
     will create a pool for you and will mix in :class:`ManagedEntityMixin` with the class_.
 
-    You can retrive an instance from the :class:Manager in the same way as :class:Pool.
+    The class must have defined *SYSTEMS*, which is a list with instances of a :class:`System`.
+
+    You can retrive an instance from the :class:`Manager` in the same way as :class:`Pool`.
 
     Parameters:
         class_ (type): The class to use.
@@ -188,7 +190,31 @@ class Manager:
 
     Raises:
         AttributeError: if the class_ has not `SYSTEMS`
+        NotImplementedError: if the class has not implemented :meth:`reset`.
 
+    Example:
+
+        .. code-block:: python
+
+            physics_system = PhysicsSystem(-10.)
+            sprites_system = SpritesSystem()
+
+            class Player:
+                SYSTEMS = (physics_system, sprites_system)
+                def __init__(self):
+                    self.x = 0
+                    self.y = 0
+                    self.status = "happy"
+                def reset(self):
+                    self.x = 0
+                    self.y = 0
+                    self.status = "happy"
+
+            player_manager = toyblock3.Manager(Player, 4)
+            player = player_manager()
+            while playing:
+                physics_system()
+                sprites_system()
     """
     def __init__(self, class_, n_entities, *args, **kwargs):
         systems = getattr(class_, "SYSTEMS", None)
