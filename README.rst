@@ -52,7 +52,7 @@ Example of use
             self.body.y = 32.
 
     # Players start at 32., 32.
-    player_manager = Manager(Player, 4, 32., 32.)
+    player_manager = toyblock3.Manager(Player, 4, 32., 32.)
     player = player_manager()
     playing = True
     while playing:
