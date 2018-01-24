@@ -11,7 +11,7 @@ Welcome to toyblock3's documentation!
    :caption: Contents:
 
 Toyblock3 is a small Entity-Component System. It just provides tools to
-contruct systems and helps you to contruct entities.
+contruct systems and helps you to manage entities.
 
 .. autoclass:: toyblock3.System
     :members:
