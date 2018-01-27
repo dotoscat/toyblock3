@@ -76,17 +76,20 @@ class Pool:
             raise NotImplementedError("Implement the reset method for {}".format(class_.__name__))
         poolable_class = type(class_.__name__, (PoolableMixin, class_), {})
         self.entities = deque([poolable_class(self, *args, **kwargs) for i in range(n_entities)])
+        self.used = deque()
 
     def free(self, entity):
         entity.reset()
         entity._used = False
         self.entities.append(entity)
+        self.used.remove(entity)
         
     def __call__(self, *args, **kwargs):
         """Return an instance from its pool. None if there is not an avaliable entity."""
         if not self.entities:
             return None
         entity = self.entities.pop()
+        self.used.append(entity)
         entity._used = True
         return entity
 
