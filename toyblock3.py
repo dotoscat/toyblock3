@@ -84,6 +84,13 @@ class Pool:
         self.entities.append(entity)
         self.used.remove(entity)
         
+    def free_all(self):
+        """
+        Free all entities used from this pool.
+        """
+        while self.used:
+           self.free(self.used[0])
+    
     def __call__(self, *args, **kwargs):
         """Return an instance from its pool. None if there is not an avaliable entity."""
         if not self.entities:

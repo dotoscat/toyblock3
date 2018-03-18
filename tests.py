@@ -3,6 +3,8 @@ import toyblock3
 
 class A:
     pass
+    def reset(self):
+        pass
 
 class TestSystem(unittest.TestCase):
         
@@ -46,6 +48,14 @@ class TestPool(unittest.TestCase):
         rect.free()
         self.assertEqual(len(RectanglePool.used), 0, "rect is not freed!")
         self.assertEqual(len(RectanglePool.entities), 8, "There are not 8 rectangles")
+
+    def test2_free_all(self):
+        a_pool = toyblock3.Pool(A, 10)
+        for i in range(7):
+            a_pool()
+        self.assertEqual(len(a_pool.used), 7, "No 7 entities used")
+        a_pool.free_all()
+        self.assertEqual(len(a_pool.used), 0, "No all entities freed")
 
 class ManagerTest(unittest.TestCase):
     def test1_manager(self):
