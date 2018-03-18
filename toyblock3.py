@@ -241,3 +241,6 @@ class Manager:
         for system in self.systems:
             system.add_entity(entity)
         return entity
+
+    def free_all(self):
+        self.pool.free_all()

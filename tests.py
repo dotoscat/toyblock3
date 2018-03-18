@@ -57,7 +57,7 @@ class TestPool(unittest.TestCase):
         a_pool.free_all()
         self.assertEqual(len(a_pool.used), 0, "No all entities freed")
 
-class ManagerTest(unittest.TestCase):
+class TestManager(unittest.TestCase):
     def test1_manager(self):
 
         class IncrementSystem(toyblock3.System):
@@ -88,3 +88,17 @@ class ManagerTest(unittest.TestCase):
         a_box.free() 
         increment_system()
         print_system()
+
+    def test2_free_all(self):
+
+        class B:
+            SYSTEMS = ()
+            def reset(self):
+                pass        
+
+        a_manager = toyblock3.Manager(B, 10)
+        for i in range(7):
+            a_manager()
+        self.assertEqual(len(a_manager.pool.used), 7, "No 7 entities used")
+        a_manager.free_all()
+        self.assertEqual(len(a_manager.pool.used), 0, "No all entities freed")

@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='toyblock3',
-    version='1.0.3',
+    version='1.1.0',
     description='A pythonic Entity-Component System written in pure Python',
     url='https://github.com/dotoscat/toyblock3',
     author='Oscar \'dotoscat\' Triano',
