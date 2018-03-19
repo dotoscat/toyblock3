@@ -156,14 +156,28 @@ class System:
             return
         entities = self._entities
         update = self._update
+        self._before_update()
         self._locked = True
         for entity in entities:
             update(entity)
         self._locked = False
+        self._after_update()
         while self._remove_entity_list:
             self._entities.remove(self._remove_entity_list.pop())
         while self._add_entity_list:
             self._entities.append(self._add_entity_list.pop())
+
+    def _before_update(self):
+        """
+        This method is called before update the entities.
+        """
+        pass
+
+    def _after_update(self):
+        """
+        This method is called after the entities has beem updated.
+        """
+        pass
 
     def _update(self, entity):
         raise NotImplementedError("Define an _update method for this system.")
